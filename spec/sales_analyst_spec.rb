@@ -10,11 +10,11 @@ SimpleCov.start
 
 RSpec.describe SalesAnalyst do
   it 'exists' do
-    sa = SalesAnalyst.new
+    sa = SalesAnalyst.new(1, 2)
     expect(sa).to be_a(SalesAnalyst)
   end
 
-  xit 'what is the average items per merchant' do
+  it 'what is the average items per merchant' do
     sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv" })
     sales_analyst = sales_engine.analyst
     expect(sales_analyst.average_items_per_merchant).to eq(2.88)

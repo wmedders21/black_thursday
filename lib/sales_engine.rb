@@ -61,4 +61,10 @@ class SalesEngine
       @invoice_repo
     end
   end
+
+  def analyst
+    merchants
+    items
+    SalesAnalyst.new(@merchant_repo, @item_repo)
+  end
 end
