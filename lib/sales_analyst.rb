@@ -55,32 +55,9 @@ class SalesAnalyst
   end
 
   def top_revenue_earners(x=20)
-    # merchant_revenue = []
-    # @merchant_repo.all.each do |merchant|
-    #   merchant_revenue_element = {merchant: merchant, revenue: BigDecimal(0)}
-    #   all_merchant_invoices = @invoice_repo.find_all_by_merchant_id(merchant.id) #returns arr of all merchant invoices
-    #   all_merchant_invoices.each do |invoice| # for each invoice in this array,
-    #     #make an array of all invoice_items associated with invoice ID
-    #     all_invoice_invoice_items = @invoice_item_repo.all.find_all { |invoice_item| invoice_item.invoice_id == invoice.id}
-    #     # require 'pry';binding.pry
-    #     revenue = all_invoice_invoice_items.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}
-    #     merchant_revenue_element[:revenue] += revenue
-    #   end
-    #   merchant_revenue << merchant_revenue_element
-    # end
-    # max_x = merchant_revenue.max(x) {|merchant_hash, next_merchant_hash| merchant_hash[:revenue] <=> next_merchant_hash[:revenue]}
-    # max_x.map {|hash| hash[:merchant]}
-
-    earnings = []
-    @merchant_repo.all.each do |merchant|
-      earnings_element = {merchant: merchant, profit: BigDecimal(0)}
-      @invoice_repo.find_all_by_merchant_id(merchant.id).each do |invoice|
-        earnings_element[:profit] += @invoice_item_repo.find_all_by_invoice_id(invoice.id).sum{|invoice_item| invoice_item.unit_price * invoice_item.quantity}
-      end
-      earnings << earnings_element
-    end
-    max_x = earnings.max(x){|hash, next_hash| hash[:profit] <=> next_hash[:profit]}
-    max_x.map {|hash| hash[:merchant]}
+    merchant_revenues = @merchant_repo.all.map{|merchant| {merchant: merchant.id, revenue: revenue_by_merchant(merchant.id)}} #array of hashes w/ id and revenue
+    top_x = merchant_revenues.max(x) {|ahash, bhash| ahash[:revenue] <=> bhash[:revenue]}
+    top_x.map! {|hash| @merchant_repo.find_by_id(hash[:merchant])}
   end
 
   def merchants_with_pending_invoices
@@ -114,5 +91,5 @@ class SalesAnalyst
     merchant_invoices.flatten!
     merchant_invoices.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}
   end
-  
+
 end
