@@ -98,7 +98,7 @@ class SalesEngine
   def invoice_items
     iir_array = @table_hash[:invoice_items].map do |row|
       InvoiceItem.new({ id: row[:id].to_i, item_id: row[:item_id].to_i, invoice_id: row[:invoice_id].to_i,
-                        quantity: row[:quantity], unit_price: BigDecimal(row[:unit_price].to_f / 100, 4), created_at: row[:created_at], updated_at: row[:updated_at] })
+                        quantity: row[:quantity], unit_price: BigDecimal(row[:unit_price].to_f / 100, 4), created_at: Time.parse(row[:created_at]), updated_at: Time.parse(row[:updated_at]) })
     end
     if @invoice_item_repo == nil
       @invoice_item_repo = InvoiceItemRepository.new(iir_array)
