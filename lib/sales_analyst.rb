@@ -92,6 +92,18 @@ class SalesAnalyst
     @invoice_repo.all.group_by { |invoice| invoice.merchant_id }
   end
 
+  def invoices_per_merchant
+    group_invoices_by_merchant_id.map { |merchant_id, invoices| invoices.count }
+  end
+
+
+    def average_invoices_per_merchant
+      invoices_per_merchant
+      (invoices_per_merchant.sum.to_f / invoices_per_merchant.count).round(2)
+    end
+
+  
+
 
 
   # def invoices_per_merchant
