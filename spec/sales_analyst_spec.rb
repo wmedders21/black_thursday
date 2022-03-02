@@ -108,6 +108,15 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.group_invoices_by_merchant_id.class).to eq(Hash)
     end
 
+    it 'makes a list of the number of invoices offered by each merchant' do
+      @sales_analyst.invoices_per_merchant
+      expect(@sales_analyst.invoices_per_merchant.class).to be(Array)
+      expect(@sales_analyst.invoices_per_merchant.count).to be(475)
+      expect(@sales_analyst.invoices_per_merchant.sum).to be(4985)
+    end
+
+
+
 
 
     xit "#top_merchants_by_invoice_count returns merchants that are two standard deviations above the mean" do
