@@ -127,4 +127,37 @@ class SalesAnalyst
       end
       result_array = @merchant_repo.all.find_all { |merchant| result_array.include?(merchant.id) }
     end
+
+    def group_invoices_by_created_at
+   @invoice_repo.all.group_by { |invoice| invoice.created_at }
+ end
+
+ def invoices_per_day
+   group_invoices_by_created_at.map { |created_at, invoices| invoices.count }
+ end
+
+ def average_invoices_per_day
+   invoices_per_day
+   (invoices_per_day.sum.to_f / invoices_per_day.count).round(2)
+ end
+
+ def average_invoices_per_day_standard_deviation
+   calculate_st_dev(invoices_per_day)
+ end
+
+ def top_days_by_invoice_count
+   day_array = []
+   high_count = average_invoices_per_day + (average_invoices_per_day_standard_deviation / 7)
+   group_invoices_by_created_at.each do |created_at, invoices|
+     if invoices.count > high_count
+       day_array << created_at
+     end
+   end
+   day_array = @invoice_repo.all.find_all { |invoice| day_array.include?(invoice.created_at) }
+ end
+
+	def invoice_status(status)
+    invoice_by_status = @invoice_repo.all.find_all { |invoice| invoice.status == status }
+	(((invoice_by_status.length).to_f / (@invoice_repo.all.length).to_f) * 100).round(2)
+	end
 end
