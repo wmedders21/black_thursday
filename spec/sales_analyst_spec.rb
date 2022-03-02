@@ -115,6 +115,12 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.invoices_per_merchant.sum).to be(4985)
     end
 
+    it "#average_invoices_per_merchant returns average number of invoices per merchant" do
+      expect(@sales_analyst.average_invoices_per_merchant).to eq(10.49)
+      expect(@sales_analyst.average_invoices_per_merchant).to be_a(Float)
+    end
+
+  
 
 
 
