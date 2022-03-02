@@ -10,7 +10,7 @@ SimpleCov.start
 
 RSpec.describe SalesAnalyst do
   context 'iteration 1' do
-    it 'exists' do
+    xit 'exists' do
       sa = SalesAnalyst.new(1, 2, 3, 4, 5, 6)
       expect(sa).to be_a(SalesAnalyst)
     end
@@ -20,28 +20,28 @@ RSpec.describe SalesAnalyst do
       @sales_analyst = @sales_engine.analyst
     end
 
-    it 'groups items by merchant id' do
+    xit 'groups items by merchant id' do
       @sales_analyst.group_items_by_merchant_id
       expect(@sales_analyst.group_items_by_merchant_id.count).to eq(475)
       expect(@sales_analyst.group_items_by_merchant_id.class).to eq(Hash)
     end
 
-    it 'makes a list of the number of items offered by each merchant' do
+    xit 'makes a list of the number of items offered by each merchant' do
       @sales_analyst.items_per_merchant
       expect(@sales_analyst.items_per_merchant.class).to be(Array)
       expect(@sales_analyst.items_per_merchant.count).to be(475)
       expect(@sales_analyst.items_per_merchant.sum).to be(1367)
     end
 
-    it 'what is the average items per merchant' do
+    xit 'what is the average items per merchant' do
       expect(@sales_analyst.average_items_per_merchant).to eq(2.88)
     end
 
-    it 'what is the standard deviation' do
+    xit 'what is the standard deviation' do
       expect(@sales_analyst.average_items_per_merchant_standard_deviation).to eq(3.26)
     end
 
-    it 'which merchants have above one st. dev. avg products offered' do
+    xit 'which merchants have above one st. dev. avg products offered' do
       expect(@sales_analyst.merchants_with_high_item_count.class).to eq(Array)
       sample1 = @sales_analyst.merchant_repo.find_by_id(@sales_analyst.merchants_with_high_item_count[0].id).id
       sample2 = @sales_analyst.merchant_repo.find_by_id(@sales_analyst.merchants_with_high_item_count[1].id).id
@@ -51,7 +51,7 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.group_items_by_merchant_id[sample3].count).to be > 6.14
     end
 
-    it 'what is the avg item price for a merchant' do
+    xit 'what is the avg item price for a merchant' do
       @sales_analyst.merchants_with_high_item_count
       sample1 = @sales_analyst.big_box_ids[0]
       sample2 = @sales_analyst.big_box_ids[1]
@@ -59,15 +59,15 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.average_item_price_for_merchant(sample2).class).to eq(BigDecimal)
     end
 
-    it 'what is the avg avg price for a merchant' do
+    xit 'what is the avg avg price for a merchant' do
       expect(@sales_analyst.average_average_price_per_merchant.class).to eq(BigDecimal)
     end
 
-    it 'average_item_price_standard_deviation' do
+    xit 'average_item_price_standard_deviation' do
       expect(@sales_analyst.average_item_price_standard_deviation).to be_a(Float)
     end
 
-    it 'what items are over two st. devs above avg item price' do
+    xit 'what items are over two st. devs above avg item price' do
       expect(@sales_analyst.golden_items.class).to eq(Array)
       expect(@sales_analyst.golden_items.count).to eq(5)
       expect(@sales_analyst.golden_items[0].class).to eq(Item)
@@ -84,12 +84,12 @@ RSpec.describe SalesAnalyst do
                                created_at: "2003-03-07", updated_at: "2008-10-09" })
     end
 
-    it 'invoice_paid_in_full?' do
+    xit 'invoice_paid_in_full?' do
       expect(@sales_analyst.invoice_paid_in_full?(@sample1.id)).to eq(true)
       expect(@sales_analyst.invoice_paid_in_full?(@sample2.id)).to eq(false)
     end
 
-    it 'returns the total $ amount of the Invoice with the corresponding id' do
+    xit 'returns the total $ amount of the Invoice with the corresponding id' do
       expect(@sales_analyst.invoice_total(@sample1.id).class).to eq(BigDecimal)
       expect(@sales_analyst.invoice_total(@sample1.id)).to eq(21067.77)
     end
@@ -102,7 +102,7 @@ RSpec.describe SalesAnalyst do
       @sales_analyst = @sales_engine.analyst
     end
 
-    it 'gives total revenue by date' do
+    xit 'gives total revenue by date' do
       revenue = @sales_analyst.total_revenue_by_date(Time.parse("2012-11-23"))
       expect(revenue.class).to eq(BigDecimal)
     end
@@ -114,26 +114,26 @@ RSpec.describe SalesAnalyst do
       expect(top[2].class).to eq(Merchant)
     end
 
-    it 'returns merchants with pending invoices' do
+    xit 'returns merchants with pending invoices' do
       pending = @sales_analyst.merchants_with_pending_invoices
       expect(pending).to be_a(Array)
       expect(pending.first).to be_a(Merchant)
     end
 
-    it 'returns merchants with only one item in their inventory' do
+    xit 'returns merchants with only one item in their inventory' do
       expected = @sales_analyst.merchants_with_only_one_item
       expect(expected).to be_a(Array)
       expect(expected.first).to be_a(Merchant)
     end
 
-    it 'returns merchants that only sell one item by the month of their creation' do
+    xit 'returns merchants that only sell one item by the month of their creation' do
       expected = @sales_analyst.merchants_with_only_one_item_registered_in_month("March")
 
       expect(expected).to be_a(Array)
       expect(expected.last).to be_a(Merchant)
     end
 
-    it 'returns total revenue for a single merchant' do
+    xit 'returns total revenue for a single merchant' do
       expected = @sales_analyst.revenue_by_merchant(12335345)
 
       expect(expected).to be_a(BigDecimal)
