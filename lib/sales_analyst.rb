@@ -102,31 +102,7 @@ class SalesAnalyst
       (invoices_per_merchant.sum.to_f / invoices_per_merchant.count).round(2)
     end
 
-  
-
-
-
-  # def invoices_per_merchant
-  #   group_invoices_by_merchant_id
-  #   @num_invoices_per_merchant = @merchant_invoices_hash.map do |merchant, invoices|
-  #     invoices.count
-  #   end
-  # end
-  #
-  # def average_invoices_per_merchant
-  #   (@invoices.length.to_f / @merchants.length.to_f).round(2)
-  # end
-  #
-  # def merchant_invoice_count
-  #   merchant_invoice_hash = {}
-  #   invoices.each do |invoice|
-  #     merchants.each do |merchant|
-  #       if invoice.merchant_id == merchant.id
-  #         merchant_invoice_hash[merchant] ||= 0
-  #         merchant_invoice_hash[merchant] += 1
-  #       end
-  #     end
-  #   end
-  #   merchant_invoice_hash
-  # end
+    def average_invoices_per_merchant_standard_deviation
+      calculate_st_dev(invoices_per_merchant)
+    end
 end
