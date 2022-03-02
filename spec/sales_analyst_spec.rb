@@ -102,17 +102,13 @@ RSpec.describe SalesAnalyst do
       @sales_analyst = @sales_engine.analyst
     end
 
-    it "#average_invoices_per_merchant returns average number of invoices per merchant" do
-      expect(@sales_analyst.average_invoices_per_merchant).to eq(10.49)
-      expect(@sales_analyst.average_invoices_per_merchant).to eq(Float)
+    it 'groups invoices by merchant id' do
+      @sales_analyst.group_items_by_merchant_id
+      expect(@sales_analyst.group_invoices_by_merchant_id.count).to eq(475)
+      expect(@sales_analyst.group_invoices_by_merchant_id.class).to eq(Hash)
     end
 
-    xit "#average_invoices_per_merchant_standard_deviation returns the standard deviation" do
-      expected = sales_analyst.average_invoices_per_merchant_standard_deviation
 
-      expect(expected).to eq 3.29
-      expect(expected.class).to eq Float
-    end
 
     xit "#top_merchants_by_invoice_count returns merchants that are two standard deviations above the mean" do
       expected = sales_analyst.top_merchants_by_invoice_count
@@ -150,6 +146,7 @@ RSpec.describe SalesAnalyst do
       expect(expected).to eq 13.5
     end
   end
+
   context 'iteration 3' do
     before :each do
       @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
