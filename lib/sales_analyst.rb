@@ -116,4 +116,15 @@ class SalesAnalyst
       end
       result_array
     end
+
+    def bottom_merchants_by_invoice_count
+      result_array = []
+      bottom_count = average_invoices_per_merchant - (average_invoices_per_merchant_standard_deviation * 2)
+      group_invoices_by_merchant_id.each do |id, invoices|
+        if invoices.count < bottom_count
+          result_array << id
+        end
+      end
+      result_array = @merchant_repo.all.find_all { |merchant| result_array.include?(merchant.id) }
+    end
 end
