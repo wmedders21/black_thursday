@@ -138,26 +138,22 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.bottom_merchants_by_invoice_count.first.class).to eq(Merchant)
     end
 
-    xit "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
-      expected = sales_analyst.top_days_by_invoice_count
+    it "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
 
-      expect(expected.length).to eq 1
-      expect(expected.first).to eq "Wednesday"
-      expect(expected.first.class).to eq String
+      expect(@sales_analyst.top_days_by_invoice_count.length).to eq(1)
+      expect(@sales_analyst.top_days_by_invoice_count.first).to eq("Wednesday")
+      expect(@sales_analyst.top_days_by_invoice_count.first.class).to eq(String)
     end
 
     xit "#invoice_status returns the percentage of invoices with given status" do
-      expected = sales_analyst.invoice_status(:pending)
 
-      expect(expected).to eq 29.55
+      expect(@sales_analyst.invoice_status(:pending)).to eq 29.55
 
-      expected = sales_analyst.invoice_status(:shipped)
 
-      expect(expected).to eq 56.95
+      expect(@sales_analyst.invoice_status(:shipped)).to eq 56.95
 
-      expected = sales_analyst.invoice_status(:returned)
 
-      expect(expected).to eq 13.5
+      expect(@sales_analyst.invoice_status(:returned)).to eq 13.5
     end
   end
 
