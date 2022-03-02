@@ -105,4 +105,15 @@ class SalesAnalyst
     def average_invoices_per_merchant_standard_deviation
       calculate_st_dev(invoices_per_merchant)
     end
+
+    def top_merchants_by_invoice_count
+      result_array = []
+      high_count = average_invoices_per_merchant + (average_invoices_per_merchant_standard_deviation * 2)
+      group_invoices_by_merchant_id.each do |id, invoices|
+        if invoices.count > high_count
+          result_array.append(merchant_repo)
+        end
+      end
+      result_array
+    end
 end
