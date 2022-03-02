@@ -64,4 +64,50 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.golden_items).to eq("ummmmm i don't know")
     end
   end
+
+  context 'Iteration 4' do
+    before :each do
+      @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                             :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+      @sales_analyst = @sales_engine.analyst
+    end
+
+    it 'gives total revenue by date' do
+      revenue = @sales_analyst.total_revenue_by_date(Time.parse("2012-11-23"))
+      expect(revenue.class).to eq(BigDecimal)
+    end
+
+    it 'returns the top revenue earners as a list of merchants' do
+      top = @sales_analyst.top_revenue_earners(4)
+      expect(top.class).to eq(Array)
+      expect(top.length).to eq(4)
+      expect(top[2].class).to eq(Merchant)
+    end
+
+    it 'returns merchants with pending invoices' do
+      pending = @sales_analyst.merchants_with_pending_invoices
+      expect(pending).to be_a(Array)
+      expect(pending.first).to be_a(Merchant)
+    end
+
+    it 'returns merchants with only one item in their inventory' do
+      expected = @sales_analyst.merchants_with_only_one_item
+      expect(expected).to be_a(Array)
+      expect(expected.first).to be_a(Merchant)
+    end
+
+    it 'returns merchants that only sell one item by the month of their creation' do
+      expected = @sales_analyst.merchants_with_only_one_item_registered_in_month("March")
+
+      expect(expected).to be_a(Array)
+      expect(expected.last).to be_a(Merchant)
+    end
+
+    it 'returns total revenue for a single merchant' do
+      expected = @sales_analyst.revenue_by_merchant(12335345)
+
+      expect(expected).to be_a(BigDecimal)
+    end
+
+  end
 end
