@@ -79,9 +79,9 @@ RSpec.describe SalesAnalyst do
                                              :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
       @sales_analyst = @sales_engine.analyst
       @sample1 = Invoice.new({ id: 1, customer_id: 1, merchant_id: 12335938, status: :pending,
-        created_at: "	2009-02-07", updated_at: "2014-03-15" })
+                               created_at: "	2009-02-07", updated_at: "2014-03-15" })
       @sample2 = Invoice.new({ id: 9, customer_id: 2, merchant_id: 12336965, status: :shipped,
-        created_at: "2003-03-07", updated_at: "2008-10-09" })
+                               created_at: "2003-03-07", updated_at: "2008-10-09" })
     end
 
     it 'invoice_paid_in_full?' do
@@ -91,7 +91,7 @@ RSpec.describe SalesAnalyst do
 
     it 'returns the total $ amount of the Invoice with the corresponding id' do
       expect(@sales_analyst.invoice_total(@sample1.id).class).to eq(BigDecimal)
-      expect(@sales_analyst.invoice_total(@sample1.id)).to eq(681.5)
+      expect(@sales_analyst.invoice_total(@sample1.id)).to eq(21067.77)
     end
   end
 end
