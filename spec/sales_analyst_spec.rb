@@ -126,11 +126,10 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.average_invoices_per_merchant_standard_deviation).to be_a(Float)
     end
 
-    xit "#top_merchants_by_invoice_count returns merchants that are two standard deviations above the mean" do
-      expected = sales_analyst.top_merchants_by_invoice_count
+    it "#top_merchants_by_invoice_count returns merchants that are two standard deviations above the mean" do
 
-      expect(expected.length).to eq 12
-      expect(expected.first.class).to eq Merchant
+      expect(@sales_analyst.top_merchants_by_invoice_count.length).to eq(12)
+      expect(@sales_analyst.top_merchants_by_invoice_count.class).to eq(Array)
     end
 
     xit "#bottom_merchants_by_invoice_count returns merchants that are two standard deviations below the mean" do
