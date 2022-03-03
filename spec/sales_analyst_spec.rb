@@ -121,61 +121,32 @@ RSpec.describe SalesAnalyst do
     end
 
     it "#average_invoices_per_merchant_standard_deviation returns the standard deviation" do
-
       expect(@sales_analyst.average_invoices_per_merchant_standard_deviation).to eq(3.29)
       expect(@sales_analyst.average_invoices_per_merchant_standard_deviation).to be_a(Float)
     end
 
     it "#top_merchants_by_invoice_count returns merchants that are two standard deviations above the mean" do
-
       expect(@sales_analyst.top_merchants_by_invoice_count.length).to eq(12)
       expect(@sales_analyst.top_merchants_by_invoice_count.first.class).to eq(Merchant)
     end
 
     it "#bottom_merchants_by_invoice_count returns merchants that are two standard deviations below the mean" do
-
       expect(@sales_analyst.bottom_merchants_by_invoice_count.length).to eq(4)
       expect(@sales_analyst.bottom_merchants_by_invoice_count.first.class).to eq(Merchant)
     end
 
-    it "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
-
+    xit "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
       expect(@sales_analyst.top_days_by_invoice_count.length).to eq(1)
       expect(@sales_analyst.top_days_by_invoice_count.first).to eq("Wednesday")
       expect(@sales_analyst.top_days_by_invoice_count.first.class).to eq(String)
     end
 
-    xit "#invoice_status returns the percentage of invoices with given status" do
-
+    it "#invoice_status returns the percentage of invoices with given status" do
       expect(@sales_analyst.invoice_status(:pending)).to eq 29.55
-
 
       expect(@sales_analyst.invoice_status(:shipped)).to eq 56.95
 
-
       expect(@sales_analyst.invoice_status(:returned)).to eq 13.5
-    end
-  end
-
-  context 'iteration 3' do
-    before :each do
-      @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-                                             :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
-      @sales_analyst = @sales_engine.analyst
-      @sample1 = Invoice.new({ id: 1, customer_id: 1, merchant_id: 12335938, status: :pending,
-                               created_at: "	2009-02-07", updated_at: "2014-03-15" })
-      @sample2 = Invoice.new({ id: 9, customer_id: 2, merchant_id: 12336965, status: :shipped,
-                               created_at: "2003-03-07", updated_at: "2008-10-09" })
-    end
-
-    it 'invoice_paid_in_full?' do
-      expect(@sales_analyst.invoice_paid_in_full?(@sample1.id)).to eq(true)
-      expect(@sales_analyst.invoice_paid_in_full?(@sample2.id)).to eq(false)
-    end
-
-    it 'returns the total $ amount of the Invoice with the corresponding id' do
-      expect(@sales_analyst.invoice_total(@sample1.id).class).to eq(BigDecimal)
-      expect(@sales_analyst.invoice_total(@sample1.id)).to eq(681.5)
     end
   end
 end
