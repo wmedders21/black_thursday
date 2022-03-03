@@ -263,7 +263,7 @@ class SalesAnalyst
 
   def best_item_for_merchant(merchant_id)
     merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # all invoices for merchant
-    merchants_invoices.keep_if {|invoice| invoice_paid_in_full(invoice.id)} # keep only if invoice made profit
+    merchants_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)} # keep only if invoice made profit
     merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten #convert remaining invoices to InvoiceItems
     item_profits = {}
     merchants_invoice_items.each {|invoice_item| item_profits[invoice_item.item_id] ? item_profits[invoice_item.item_id] += (invoice_item.quantity * invoice_item.unit_price) : item_profits[invoice_item.item_id] = (invoice_item.quantity *invoice_item.unit_price)}
