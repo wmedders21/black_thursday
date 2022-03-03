@@ -16,11 +16,4 @@ class Customer
     @created_at = info_hash[:created_at]
     @updated_at = info_hash[:updated_at]
   end
-
-  # def update(attributes)
-  #   attributes[:updated_at] = "2022-02-26 03:17:26 UTC"
-  #   @first_name = attributes[:first_name] || @first_name
-  #   @last_name = attributes[:last_name] || @last_name
-  #   @updated_at = attributes[:updated_at]
-  # end
 end

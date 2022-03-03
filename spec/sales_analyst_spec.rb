@@ -73,27 +73,6 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.golden_items[0].class).to eq(Item)
     end
   end
-  context 'iteration 3' do
-    before :each do
-      @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-                                             :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
-      @sales_analyst = @sales_engine.analyst
-      @sample1 = Invoice.new({ id: 1, customer_id: 1, merchant_id: 12335938, status: :pending,
-                               created_at: "	2009-02-07", updated_at: "2014-03-15" })
-      @sample2 = Invoice.new({ id: 9, customer_id: 2, merchant_id: 12336965, status: :shipped,
-                               created_at: "2003-03-07", updated_at: "2008-10-09" })
-    end
-
-    it 'invoice_paid_in_full?' do
-      expect(@sales_analyst.invoice_paid_in_full?(@sample1.id)).to eq(true)
-      expect(@sales_analyst.invoice_paid_in_full?(@sample2.id)).to eq(false)
-    end
-
-    it 'returns the total $ amount of the Invoice with the corresponding id' do
-      expect(@sales_analyst.invoice_total(@sample1.id).class).to eq(BigDecimal)
-      expect(@sales_analyst.invoice_total(@sample1.id)).to eq(21067.77)
-    end
-  end
 
   context "iteration 2" do
     before :each do
@@ -101,7 +80,6 @@ RSpec.describe SalesAnalyst do
                                              :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
       @sales_analyst = @sales_engine.analyst
     end
-
     it 'groups invoices by merchant id' do
       @sales_analyst.group_items_by_merchant_id
       expect(@sales_analyst.group_invoices_by_merchant_id.count).to eq(475)
@@ -145,6 +123,8 @@ RSpec.describe SalesAnalyst do
 
     it 'can define numbers to corresponding days' do
       expect(@sales_analyst.num_to_days(4)).to eq("Thursday")
+      expect(@sales_analyst.num_to_days(5)).to eq("Friday")
+      expect(@sales_analyst.num_to_days(6)).to eq("Saturday")
     end
 
     it "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
@@ -159,6 +139,73 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.invoice_status(:shipped)).to eq 56.95
 
       expect(@sales_analyst.invoice_status(:returned)).to eq 13.5
+    end
+  end
+
+  context 'iteration 3' do
+    before :each do
+      @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                             :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+      @sales_analyst = @sales_engine.analyst
+      @sample1 = Invoice.new({ id: 1, customer_id: 1, merchant_id: 12335938, status: :pending,
+                               created_at: "	2009-02-07", updated_at: "2014-03-15" })
+      @sample2 = Invoice.new({ id: 9, customer_id: 2, merchant_id: 12336965, status: :shipped,
+                               created_at: "2003-03-07", updated_at: "2008-10-09" })
+    end
+
+    it 'invoice_paid_in_full?' do
+      expect(@sales_analyst.invoice_paid_in_full?(@sample1.id)).to eq(true)
+      expect(@sales_analyst.invoice_paid_in_full?(@sample2.id)).to eq(false)
+    end
+
+    it 'returns the total $ amount of the Invoice with the corresponding id' do
+      expect(@sales_analyst.invoice_total(@sample1.id).class).to eq(BigDecimal)
+      expect(@sales_analyst.invoice_total(@sample1.id)).to eq(21067.77)
+    end
+  end
+
+  context 'Iteration 4' do
+    before :each do
+      @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                             :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+      @sales_analyst = @sales_engine.analyst
+    end
+
+    it 'gives total revenue by date' do
+      revenue = @sales_analyst.total_revenue_by_date(Time.parse("2012-11-23"))
+      expect(revenue.class).to eq(BigDecimal)
+    end
+
+    it 'returns the top revenue earners as a list of merchants' do
+      top = @sales_analyst.top_revenue_earners(4)
+      expect(top.class).to eq(Array)
+      expect(top.length).to eq(4)
+      expect(top[2].class).to eq(Merchant)
+    end
+
+    it 'returns merchants with pending invoices' do
+      pending = @sales_analyst.merchants_with_pending_invoices
+      expect(pending).to be_a(Array)
+      expect(pending.first).to be_a(Merchant)
+    end
+
+    it 'returns merchants with only one item in their inventory' do
+      expected = @sales_analyst.merchants_with_only_one_item
+      expect(expected).to be_a(Array)
+      expect(expected.first).to be_a(Merchant)
+    end
+
+    it 'returns merchants that only sell one item by the month of their creation' do
+      expected = @sales_analyst.merchants_with_only_one_item_registered_in_month("March")
+
+      expect(expected).to be_a(Array)
+      expect(expected.last).to be_a(Merchant)
+    end
+
+    it 'returns total revenue for a single merchant' do
+      expected = @sales_analyst.revenue_by_merchant(12335345)
+
+      expect(expected).to be_a(BigDecimal)
     end
   end
 end

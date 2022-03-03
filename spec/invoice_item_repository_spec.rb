@@ -79,14 +79,8 @@ RSpec.describe InvoiceItemRepository do
     expect(@iir.all).to eq([])
   end
 
-  # it 'can sum invoice_items from a given invoice_id' do
-  #   expect(@irr.sum_invoice_items(9)).to eq(0.1989e4)
-  # end
-
   it 'initializes from SalesEngine#invoice_items()' do
     se = SalesEngine.from_csv({ :invoice_items => "./data/invoice_items.csv" })
-    # se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-    #                             :customers => "./data/customers.csv", :invoice_items => "./data/invoice_item.csv" })
     iir = se.invoice_items
     expect(@iir).to be_a(InvoiceItemRepository)
   end
