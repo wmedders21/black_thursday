@@ -94,4 +94,71 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.invoice_total(@sample1.id)).to eq(21067.77)
     end
   end
+
+  context "iteration 2" do
+    before :each do
+      @sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                             :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+      @sales_analyst = @sales_engine.analyst
+    end
+
+    it 'groups invoices by merchant id' do
+      @sales_analyst.group_items_by_merchant_id
+      expect(@sales_analyst.group_invoices_by_merchant_id.count).to eq(475)
+      expect(@sales_analyst.group_invoices_by_merchant_id.class).to eq(Hash)
+    end
+
+    it 'makes a list of the number of invoices offered by each merchant' do
+      @sales_analyst.invoices_per_merchant
+      expect(@sales_analyst.invoices_per_merchant.class).to be(Array)
+      expect(@sales_analyst.invoices_per_merchant.count).to be(475)
+      expect(@sales_analyst.invoices_per_merchant.sum).to be(4985)
+    end
+
+    it "#average_invoices_per_merchant returns average number of invoices per merchant" do
+      expect(@sales_analyst.average_invoices_per_merchant).to eq(10.49)
+      expect(@sales_analyst.average_invoices_per_merchant).to be_a(Float)
+    end
+
+    it "#average_invoices_per_merchant_standard_deviation returns the standard deviation" do
+      expect(@sales_analyst.average_invoices_per_merchant_standard_deviation).to eq(3.29)
+      expect(@sales_analyst.average_invoices_per_merchant_standard_deviation).to be_a(Float)
+    end
+
+    it "#top_merchants_by_invoice_count returns merchants that are two standard deviations above the mean" do
+      expect(@sales_analyst.top_merchants_by_invoice_count.length).to eq(12)
+      expect(@sales_analyst.top_merchants_by_invoice_count.first.class).to eq(Merchant)
+    end
+
+    it "#bottom_merchants_by_invoice_count returns merchants that are two standard deviations below the mean" do
+      expect(@sales_analyst.bottom_merchants_by_invoice_count.length).to eq(4)
+      expect(@sales_analyst.bottom_merchants_by_invoice_count.first.class).to eq(Merchant)
+    end
+
+    it 'can find invoices by day of the week' do
+      expect(@sales_analyst.invoices_by_days_of_the_week[2].length).to eq(692)
+    end
+
+    it 'can find the standard deviation of the invoices per day of week' do
+      expect(@sales_analyst.invoices_per_day_of_week_standard_deviation).to eq(18)
+    end
+
+    it 'can define numbers to corresponding days' do
+      expect(@sales_analyst.num_to_days(4)).to eq("Thursday")
+    end
+
+    it "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
+      expect(@sales_analyst.top_days_by_invoice_count.length).to eq(1)
+      expect(@sales_analyst.top_days_by_invoice_count.first).to eq("Wednesday")
+      expect(@sales_analyst.top_days_by_invoice_count.first.class).to eq(String)
+    end
+
+    it "#invoice_status returns the percentage of invoices with given status" do
+      expect(@sales_analyst.invoice_status(:pending)).to eq 29.55
+
+      expect(@sales_analyst.invoice_status(:shipped)).to eq 56.95
+
+      expect(@sales_analyst.invoice_status(:returned)).to eq 13.5
+    end
+  end
 end
