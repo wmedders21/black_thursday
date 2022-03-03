@@ -77,15 +77,12 @@ class SalesAnalyst
   end
 
   def invoice_paid_in_full?(invoice_id)
-    transaction = @transaction_repo.all.find { |transaction| transaction.invoice_id == invoice_id }
-    if transaction == nil
-      return false
-    elsif transaction.result == :failed
-      return false
+      transaction = @transaction_repo.all.find_all { |transaction| transaction.invoice_id == invoice_id }
+      if transaction == []
+        return false
+      end
+      transaction.any? { |k| k.result == :success }
     end
-
-    transaction.result == :success
-  end
 
   def invoice_total(invoice_id)
     if invoice_paid_in_full?(invoice_id)
@@ -264,9 +261,27 @@ class SalesAnalyst
     # return max_item[:items] # return the array of max items
   end
 
+  def best_item_for_merchant(id)
+    merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # all invoices for merchant
+    merchants_invoices.keep_if {|invoice| invoice_paid_in_full(invoice.id)} # keep only if invoice made profit
+    merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten #convert remaining invoices to InvoiceItems
+    item_profits = {}
+    merchants_invoice_items.each {|invoice_item| item_profits[invoice_item.item_id] ? item_profits[invoice_item.item_id] += invoice_item.quantity * invoice_item.unit_price : item_profits[invoice_item.item_id] = invoice_item.quantity *invoice_item.unit_price}
+    max_profit = {profit: 0 items: []} #comparison hash holder
+    item_profits.each_pair {|i, p|  if p == max_profit[:profit] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
+                                      max_profit[:items] << i
+                                    elsif p > max_profit[:profit]
+                                      max_profit[:items].clear
+                                      max_profit[:items] << i
+                                      max_profit[:profit] = p
+                                    end}
+    output = max_profit[:items].map {|item_num| @item_repo.find_by_id(item_num)}
+  end
+
 end
 
 sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
                                        :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv"})
 
 puts sales_engine.analyst.most_sold_item_for_merchant(12334684)
+puts sales_engine.analyst.best_item_for_merchant(12334684)
