@@ -207,5 +207,19 @@ RSpec.describe SalesAnalyst do
 
       expect(expected).to be_a(BigDecimal)
     end
+
+    it 'returns paid invoice items for a given merchant' do
+      expected = @sales_analyst.helper_get_profitable_invoices(12335024)
+
+      expect(expected.first).to be_a(InvoiceItem)
+    end
+
+    it 'returns an array of items from a formatted hash' do
+      formatted_hash = {263451719 => 14, 263509232 => 9, 12337005 => 25}
+      max_measure = {measure: 0, items: []}
+      expected = @sales_analyst.helper_get_greatest_measure(formatted_hash, max_measure)
+      expect(expected).to be_a(Array)
+      expect(expected.length).to eq(1)
+    end
   end
 end

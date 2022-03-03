@@ -280,6 +280,7 @@ class SalesAnalyst
   end
 
   def helper_get_greatest_measure(item_measure, max_measure)
+
     item_measure.each_pair {|i, m|  if m == max_measure[:measure]
                                       max_measure[:items] << i
                                     elsif m > max_measure[:measure]
