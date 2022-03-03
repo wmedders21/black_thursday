@@ -9,7 +9,6 @@ SimpleCov.start
 
 RSpec.describe CustomerRepository do
   before :each do
-    # @cr = CustomerRepository.new[Customer.new({id: 24, first_name: 'Esteban', last_name:  'Jenkins', created_at:  Time.now, updated_at:  Time.now })]
     @customer_1 = Customer.new({ id: 1, first_name: 'Carl', last_name: 'Carson', created_at: Time.now,
                                  updated_at: Time.now })
     @customer_2 = Customer.new({ id: 2, first_name: 'Becky', last_name: 'Benson', created_at: Time.now,
@@ -17,17 +16,10 @@ RSpec.describe CustomerRepository do
     @customer_3 = Customer.new({ id: 3, first_name: 'Pete', last_name:  'Davidson', created_at: Time.now,
                                  updated_at: Time.now })
     @cr = CustomerRepository.new([@customer_1, @customer_2, @customer_3])
-    # @cr = CustomerRepository.new('./data/customer.csv')
   end
-
-  # it 'exists' do
-  #   expect(@cr).to be_a(CustomerRepository)
-  #   # expect(@cr.all.[23]).to be_an_instance_of(Customer)
-  # end
 
   it 'has attributes' do
     expect(@cr).to be_a(CustomerRepository)
-    # expect(@cr.all).to be_a(Array)
   end
 
   it 'finds a specific customer by id' do
@@ -53,8 +45,6 @@ RSpec.describe CustomerRepository do
     expect(@cr.all.length).to eq(4)
     expect(@cr.all.last).to be_a(Customer)
     expect(@cr.all.last.id).to eq(4)
-    expect(@cr.all.last.created_at).to be_truthy
-    expect(@cr.all.last.updated_at).to be_truthy
   end
 
   it 'can update Customer instances with attributes' do
@@ -85,6 +75,5 @@ RSpec.describe CustomerRepository do
     se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
                                 :customers => "./data/customers.csv" })
     cr = se.customers
-    # expect(cr.find_by_id(24).first_name).to eq("Esteban")
   end
 end

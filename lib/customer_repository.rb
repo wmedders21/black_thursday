@@ -26,35 +26,4 @@ class CustomerRepository
 
   def inspect
   end
-
-  # def create(attributes)
-  #   new_id = all.max_by {|customer| customer.id }.id + 1
-  #   attributes[:id] = new_id
-  #   all << Customer.new(attributes)
-  # end
-  #
-  # def update(id, attributes)
-  #   customer = find_by_id(id)
-  #   customer.first_name = attributes[:first_name]
-  #   customer.last_name = attributes[:last_name]
-  #   customer.updated_at = Time.now
-  # end
-  #
-  # def delete(id)
-  #   customer = find_by_id(id)
-  #   all.delete(customer)
-  # end
-
-  # def populate_repository(path)
-  #   CSV.read(path, headers: true, header_converters: :symbol) do |row|
-  #     info_hash = {
-  #       id: row[:id].to_i,
-  #       first_name: row[:first_name],
-  #       last_name: row[:last_name],
-  #       created_at: Time.parse(row[:created_at]),
-  #       updated_at: Time.parse(row[:updated_at])
-  #     }
-  #     @all << Customer.new(info_hash)
-  #   end
-  # end
 end

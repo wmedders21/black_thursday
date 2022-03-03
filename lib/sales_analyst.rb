@@ -1,7 +1,5 @@
-
 require 'pry'
 require 'date'
-
 
 class SalesAnalyst
   attr_reader :merchant_repo, :item_repo, :transaction_repo, :invoice_item_repo, :invoice_repo, :customer_repo,
@@ -80,9 +78,10 @@ class SalesAnalyst
     transaction = @transaction_repo.all.find_all { |transaction| transaction.invoice_id == invoice_id }
     if transaction == []
       return false
-    # elsif transaction.result == :failed
-    #   return false
+      # elsif transaction.result == :failed
+      #   return false
     end
+
     transaction.any? { |k| k.result == :success }
     # binding.pry
   end
@@ -97,28 +96,33 @@ class SalesAnalyst
     end
   end
 
-
-  def total_revenue_by_date (time_obj)
-    invoices_from_year = @invoice_repo.all.find_all {|invoice| invoice.created_at.year == time_obj.year}
-    invoices_from_month = invoices_from_year.keep_if {|invoice| invoice.created_at.month == time_obj.month}
-    invoices_from_day = invoices_from_month.keep_if {|invoice| invoice.created_at.day == time_obj.day}
-    invoices_from_day.map! {|invoice| @invoice_item_repo.all.find_all{|invoice_item| invoice_item.invoice_id == invoice.id}}
-    invoices_from_day.flatten!.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}
+  def total_revenue_by_date(time_obj)
+    invoices_from_year = @invoice_repo.all.find_all { |invoice| invoice.created_at.year == time_obj.year }
+    invoices_from_month = invoices_from_year.keep_if { |invoice| invoice.created_at.month == time_obj.month }
+    invoices_from_day = invoices_from_month.keep_if { |invoice| invoice.created_at.day == time_obj.day }
+    invoices_from_day.map! { |invoice|
+      @invoice_item_repo.all.find_all { |invoice_item|
+        invoice_item.invoice_id == invoice.id
+      }
+    }
+    invoices_from_day.flatten!.sum { |invoice_item| invoice_item.unit_price * invoice_item.quantity }
   end
 
-  def top_revenue_earners(x=20)
+  def top_revenue_earners(x = 20)
     paid_invoices = @invoice_repo.all.map { |invoice| invoice if invoice_paid_in_full?(invoice.id) }.compact
     invoices_by_merch_id = paid_invoices.group_by { |invoice| invoice.merchant_id }
     invoice_revenue_by_merch_id = invoices_by_merch_id.each { |k, v| v.map! { |v| invoice_total(v.id) } }
     tot_rev_by_merch_id = invoice_revenue_by_merch_id.transform_values { |value| value.sum }
     tot_rev_by_merchant = tot_rev_by_merch_id.transform_keys { |key| @merchant_repo.find_by_id(key) }
-    sorted_merchants = tot_rev_by_merchant.sort_by { |k,v| v }.reverse
-    top_earners = sorted_merchants.map { |array| array.first }.flatten[0..(x-1)]
+    sorted_merchants = tot_rev_by_merchant.sort_by { |k, v| v }.reverse
+    top_earners = sorted_merchants.map { |array| array.first }.flatten[0..(x - 1)]
     # binding.pry
   end
 
   def merchants_with_pending_invoices
-    all_pending_invoices = @invoice_repo.find_all_by_status(:pending).map{|invoice| @merchant_repo.find_by_id(invoice.merchant_id)}
+    all_pending_invoices = @invoice_repo.find_all_by_status(:pending).map { |invoice|
+      @merchant_repo.find_by_id(invoice.merchant_id)
+    }
     all_failed_transactions = @transaction_repo.find_all_by_result(:failed).map do |transaction|
       id = @invoice_repo.find_by_id(transaction.invoice_id).merchant_id
       @merchant_repo.find_by_id(id)
@@ -127,27 +131,40 @@ class SalesAnalyst
   end
 
   def merchants_with_only_one_item
-    merchant_ids = @item_repo.all.map {|item| item.merchant_id}
+    merchant_ids = @item_repo.all.map { |item| item.merchant_id }
     returned_ids = merchant_ids
-    returned_ids.delete_if{|returned_id| merchant_ids.find_all{|merchant_id| merchant_id == returned_id}.length > 1}
-    returned_merchants = returned_ids.map{|id| @merchant_repo.find_by_id(id)}
+    returned_ids.delete_if { |returned_id|
+      merchant_ids.find_all { |merchant_id|
+        merchant_id == returned_id
+      }.length > 1
+    }
+    returned_merchants = returned_ids.map { |id| @merchant_repo.find_by_id(id) }
   end
 
-  def merchants_with_only_one_item_registered_in_month (month_str)
-    applicable_invoices = @invoice_repo.all.find_all{|invoice| invoice.created_at.month == Time.parse(month_str).month}
-    applicable_invoices.map! {|invoice| {invoice: invoice, merchant: @merchant_repo.find_by_id(invoice.merchant_id)}}
-    applicable_invoices.delete_if{|hash| hash[:invoice].created_at.year != hash[:merchant].created_at.year}
+  def merchants_with_only_one_item_registered_in_month(month_str)
+    applicable_invoices = @invoice_repo.all.find_all { |invoice|
+      invoice.created_at.month == Time.parse(month_str).month
+    }
+    applicable_invoices.map! { |invoice|
+      { invoice: invoice, merchant: @merchant_repo.find_by_id(invoice.merchant_id) }
+    }
+    applicable_invoices.delete_if { |hash| hash[:invoice].created_at.year != hash[:merchant].created_at.year }
     returned_merchants = applicable_invoices
-    returned_merchants.delete_if{ |returned_hash| (applicable_invoices.find_all{ |applicable_hash| applicable_hash[:merchant] == returned_hash[:merchant]}).length > 1}
-    returned_merchants.map{|hash| hash[:merchant]}
+    returned_merchants.delete_if { |returned_hash|
+      (applicable_invoices.find_all { |applicable_hash|
+         applicable_hash[:merchant] == returned_hash[:merchant]
+       }).length > 1
+    }
+    returned_merchants.map { |hash| hash[:merchant] }
   end
 
-  def revenue_by_merchant (merchant_id)
+  def revenue_by_merchant(merchant_id)
     merchant_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id)
-    merchant_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)}
-    merchant_invoices.map! { |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}
+    merchant_invoices.keep_if { |invoice| invoice_paid_in_full?(invoice.id) }
+    merchant_invoices.map! { |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id) }
     merchant_invoices.flatten!
-    merchant_invoices.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}
+    merchant_invoices.sum { |invoice_item| invoice_item.unit_price * invoice_item.quantity }
+  end
 
   def group_invoices_by_merchant_id
     @invoice_repo.all.group_by { |invoice| invoice.merchant_id }
@@ -238,6 +255,5 @@ class SalesAnalyst
   def invoice_status(status)
     invoice_by_status = @invoice_repo.all.find_all { |invoice| invoice.status == status }
     (((invoice_by_status.length).to_f / (@invoice_repo.all.length).to_f) * 100).round(2)
-
   end
 end
