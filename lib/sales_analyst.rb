@@ -280,7 +280,8 @@ class SalesAnalyst
   end
 
   def helper_get_greatest_measure(item_measure, max_measure)
-    item_measure.each_pair {|i, m|  if m == max_measure[:measure] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
+
+    item_measure.each_pair {|i, m|  if m == max_measure[:measure]
                                       max_measure[:items] << i
                                     elsif m > max_measure[:measure]
                                       max_measure[:items].clear
@@ -289,23 +290,4 @@ class SalesAnalyst
                                     end}
     output = max_measure[:items].map {|item_num| @item_repo.find_by_id(item_num)}
   end
-
 end
-#
-# require_relative './sales_engine'
-# se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-#                                        :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
-#
-# p se.analyst.most_sold_item_for_merchant(12335009)
-# p "-----------------------------"
-# p se.analyst.best_item_for_merchant(12335009)
-# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-# p se.analyst.most_sold_item_for_merchant(12335057)
-# p "-----------------------------"
-# p se.analyst.best_item_for_merchant(12335057)
-# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-#
-# p se.analyst.most_sold_item_for_merchant(12335080)
-# p "-----------------------------"
-# p se.analyst.best_item_for_merchant(12335080)
-# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
