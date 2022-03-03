@@ -133,7 +133,7 @@ class SalesAnalyst
     created_at_dates = []
     @invoice_repo.all.each { |invoice| created_at_dates << invoice.created_at }
     days_of_week = []
-    created_at_dates.each { |date| days_of_week << Date.parse(date).wday }
+    created_at_dates.each { |date| days_of_week << date.wday }
     days_in_order = []
     (0..6).each { |num| days_in_order << days_of_week.find_all { |day| day == num } }
     days_in_order
