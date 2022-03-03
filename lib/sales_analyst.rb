@@ -314,9 +314,14 @@ class SalesAnalyst
     (((invoice_by_status.length).to_f / (@invoice_repo.all.length).to_f) * 100).round(2)
   end
 
-  def most_sold_item_for_merchant(merchant_id)
+  def helper_get_profitable_invoices(merchant_id)
     merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # get all merchant's invoices in an array
+    merchants_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)} # keep only if invoice made profit
     merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten # convert to an array of arrays of invoice items, and flatten
+  end
+
+  def most_sold_item_for_merchant(merchant_id)
+    merchants_invoice_items = helper_get_profitable_invoices(merchant_id)
     item_measure = {} # new hash
     # for each invoice item, if the item ID exists as a key in new hash, increment the value by invoice item quantity, or else create the key and set the value to quantity. Creates hash of unique item keys and sums of sales quantities
     merchants_invoice_items.each {|invoice_item| item_measure[invoice_item.item_id] ? item_measure[invoice_item.item_id] += invoice_item.quantity : item_measure[invoice_item.item_id] = invoice_item.quantity}
@@ -325,9 +330,7 @@ class SalesAnalyst
   end
 
   def best_item_for_merchant(merchant_id)
-    merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # all invoices for merchant
-    merchants_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)} # keep only if invoice made profit
-    merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten #convert remaining invoices to InvoiceItems
+    merchants_invoice_items = helper_get_profitable_invoices(merchant_id)
     item_measure = {}
     merchants_invoice_items.each {|invoice_item| item_measure[invoice_item.item_id] ? item_measure[invoice_item.item_id] += (invoice_item.quantity * invoice_item.unit_price) : item_measure[invoice_item.item_id] = (invoice_item.quantity * invoice_item.unit_price)}
     max_measure = {measure: 0, items: []} #comparison hash holder
@@ -347,20 +350,21 @@ class SalesAnalyst
   end
 
 end
-#
-# se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-#                                        :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
-#
-# p se.analyst.most_sold_item_for_merchant(12335009)
-# p "-----------------------------"
-# p se.analyst.best_item_for_merchant(12335009)
-# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-# p se.analyst.most_sold_item_for_merchant(12335057)
-# p "-----------------------------"
-# p se.analyst.best_item_for_merchant(12335057)
-# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-#
-# p se.analyst.most_sold_item_for_merchant(12335080)
-# p "-----------------------------"
-# p se.analyst.best_item_for_merchant(12335080)
-# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+
+require_relative './sales_engine'
+se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                       :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+
+p se.analyst.most_sold_item_for_merchant(12335009)
+p "-----------------------------"
+p se.analyst.best_item_for_merchant(12335009)
+p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+p se.analyst.most_sold_item_for_merchant(12335057)
+p "-----------------------------"
+p se.analyst.best_item_for_merchant(12335057)
+p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+
+p se.analyst.most_sold_item_for_merchant(12335080)
+p "-----------------------------"
+p se.analyst.best_item_for_merchant(12335080)
+p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
