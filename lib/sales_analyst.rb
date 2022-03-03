@@ -261,7 +261,7 @@ class SalesAnalyst
     # return max_item[:items] # return the array of max items
   end
 
-  def best_item_for_merchant(id)
+  def best_item_for_merchant(merchant_id)
     merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # all invoices for merchant
     merchants_invoices.keep_if {|invoice| invoice_paid_in_full(invoice.id)} # keep only if invoice made profit
     merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten #convert remaining invoices to InvoiceItems
