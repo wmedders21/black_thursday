@@ -129,73 +129,17 @@ class SalesAnalyst
     result_array = @merchant_repo.all.find_all { |merchant| result_array.include?(merchant.id) }
   end
 
-  # def average_invoices_per_day_standard_deviation
-  #   values = invoices_per_day.values
-  #   total = 0
-  #   mean = values.reduce(:+) / values.length
-  #   values.map {|num| total += ((num - mean) **2)}
-  #   Math.sqrt(total / values.length)
-  # end
-  #
-  # def invoices_per_day_mean
-  #   values = invoices_per_day.values
-  #   values.reduce(:+) / values.length
-  # end
-  #
-  # def top_days_by_invoice_count
-  #   num_to_beat = invoices_per_day_mean + invoices_per_day_standard_deviation
-  #   most_invoices = invoices_per_day.select {|key, value| value > num_to_beat}
-  #   ranked = most_invoices.sort_by {|key, value| value}.reverse.flatten
-  #   ranked.select {|item| item.class == String }
-  # end
-  #
-  # def invoices_per_day
-  #   counts = Hash.new(0)
-  #    @invoice_repo.all.map {|invoice| invoice.created_at.to_s}
-  #    day = invoice.created_at.to_s
-  #    counts[Date.parse(day).strftime("%A")]+= 1
-  #   end
+  def invoices_by_days_of_the_week
+   created_at_dates = []
+   @invoice_repo.all.each {|invoice| created_at_dates << invoice.created_at}
+   days_of_week = []
+   created_at_dates.each {|date| days_of_week << Date.parse(date).wday}
+   days_in_order = []
+   (0..6).each { |num| days_in_order << days_of_week.find_all{|day| day == num} }
+   days_in_order
+ end
 
-  # def average_invoices_per_day
-  # average(@invoice_repo.all.count,
-  # all_invoice_created_dates.uniq.count).to_f
-  # end
-  #
-  # def number_of_invoices_by_weekday
-  # weekdays = %w[sunday monday tuesday wednesday thursday friday saturday]
-  # all_days = @invoice_repo.all.map(&:created_at)
-  # by_dates = all_days.group_by do |date|
-  # weekdays[date.wday]
-  # end
-  # by_dates.each_key do |id|
-  # by_dates[id] = by_dates[id].count
-  # end
-  # end
-  #
-  # def average_invoices_per_day_standard_deviation
-  # unique_days = @invoice_repo.all.map(&:created_at).uniq
-  # number_of_invoices_per_day = unique_days.map do |date|
-  # @invoice_repo.find_all_by_created_date(date).count
-  # end
-  # standard_deviation(number_of_invoices_per_day,
-  # average_invoices_per_day)
-  # end
-  #
-  # def number_of_invoices_per_weekday
-  # number_of_invoices_by_weekday.values
-  # end
-  #
-  # def average_invoices_per_weekday
-  # average(number_of_invoices_per_weekday.inject(:+), number_of_invoices_per_weekday.count)
-  # end
-  #
-  # def average_invoices_per_weekday_standard_deviation
-  # standard_deviation(number_of_invoices_per_weekday, average_invoices_per_weekday)
-  # end
-  #
-  # def average_invoices_per_weekday_plus_one_standard_deviation
-  # average_invoices_per_weekday + average_invoices_per_weekday_standard_deviation
-  # end
+
 
   def invoice_status(status)
     invoice_by_status = @invoice_repo.all.find_all { |invoice| invoice.status == status }
