@@ -135,11 +135,11 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.bottom_merchants_by_invoice_count.first.class).to eq(Merchant)
     end
 
-    xit "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
-      expect(@sales_analyst.top_days_by_invoice_count.length).to eq(1)
-      expect(@sales_analyst.top_days_by_invoice_count.first).to eq("Wednesday")
-      expect(@sales_analyst.top_days_by_invoice_count.first.class).to eq(String)
+    it 'can find invoices by day of the week' do
+      expect(@sales_analyst.invoices_by_days_of_the_week[2].length).to eq(692)
     end
+
+
 
     it "#invoice_status returns the percentage of invoices with given status" do
       expect(@sales_analyst.invoice_status(:pending)).to eq 29.55
