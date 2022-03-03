@@ -1,3 +1,5 @@
+require_relative './sales_engine.rb'
+
 class SalesAnalyst
   attr_reader :merchant_repo, :item_repo, :transaction_repo, :invoice_item_repo, :invoice_repo, :customer_repo,
               :big_box_ids
@@ -151,19 +153,25 @@ class SalesAnalyst
   end
 
   def most_sold_item_for_merchant(merchant_id)
-    merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id)
-    merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten
-    summed_invoice_items = {}
-    merchants_invoiced_items.each {|invoice_item| summed_invoice_items[invoice_item.item_id] ? summed_invoice_items[invoice_item.item_id] += invoice_item.quantity : summed_invoice_items[invoice_item.item_id] += invoice_item.quantity}
-    max_item = {quantity: 0 items: []}
-    summed_invoice_items.each_pair {|i, q|  if q == max_item[:quantity]
+    merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # get all merchant's invoices in an array
+    merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten # convert to an array of arrays of invoice items, and flatten
+    summed_invoice_items = {} # new hash
+    # for each invoice item, if the item ID exists as a key in new hash, increment the value by invoice item quantity, or else create the key and set the value to quantity. Creates hash of unique item keys and sums of sales quantities
+    merchants_invoice_items.each {|invoice_item| summed_invoice_items[invoice_item.item_id] ? summed_invoice_items[invoice_item.item_id] += invoice_item.quantity : summed_invoice_items[invoice_item.item_id] = invoice_item.quantity}
+    max_item = {quantity: 0, items: []} #comparison holder hash
+    summed_invoice_items.each_pair {|i, q|  if q == max_item[:quantity] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
                                               max_item[:items] << i
                                             elsif q > max_item[:quantity]
                                               max_item[:items].clear
                                               max_item[:items] << i
                                               max_items[:quantity] = q
                                             end}
-    return max_items[:items]
+    return max_items[:items] # return the array of max items
   end
 
 end
+
+sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                       :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv"})
+
+puts sales_engine.analyst.most_sold_item_for_merchant(12334257)
