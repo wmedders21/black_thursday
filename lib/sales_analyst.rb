@@ -260,7 +260,8 @@ class SalesAnalyst
                                               max_item[:items] << i
                                               max_item[:quantity] = q
                                             end}
-    return max_item[:items] # return the array of max items
+    output = max_item[:items].map {|item_num| @item_repo.find_by_id(item_num)}
+    # return max_item[:items] # return the array of max items
   end
 
 end
@@ -268,4 +269,4 @@ end
 sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
                                        :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv"})
 
-puts sales_engine.analyst.most_sold_item_for_merchant(12334257)
+puts sales_engine.analyst.most_sold_item_for_merchant(12334684)
