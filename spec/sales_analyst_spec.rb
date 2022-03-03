@@ -123,6 +123,8 @@ RSpec.describe SalesAnalyst do
 
     it 'can define numbers to corresponding days' do
       expect(@sales_analyst.num_to_days(4)).to eq("Thursday")
+      expect(@sales_analyst.num_to_days(5)).to eq("Friday")
+      expect(@sales_analyst.num_to_days(6)).to eq("Saturday")
     end
 
     it "#top_days_by_invoice_count returns days with an invoice count more than one standard deviation above the mean" do
