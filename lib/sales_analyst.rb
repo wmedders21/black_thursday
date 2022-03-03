@@ -1,3 +1,5 @@
+require 'pry'
+
 class SalesAnalyst
   attr_reader :merchant_repo, :item_repo, :transaction_repo, :invoice_item_repo, :invoice_repo, :customer_repo,
               :big_box_ids
@@ -78,7 +80,6 @@ class SalesAnalyst
     elsif transaction.result == :failed
       return false
     end
-
     transaction.result == :success
   end
 
@@ -92,50 +93,22 @@ class SalesAnalyst
     end
   end
 
-  def total_revenue_by_date (time_obj) #passing
-      # require 'pry';binding.pry
+  def total_revenue_by_date (time_obj)
     invoices_from_year = @invoice_repo.all.find_all {|invoice| invoice.created_at.year == time_obj.year}
     invoices_from_month = invoices_from_year.keep_if {|invoice| invoice.created_at.month == time_obj.month}
     invoices_from_day = invoices_from_month.keep_if {|invoice| invoice.created_at.day == time_obj.day}
     invoices_from_day.map! {|invoice| @invoice_item_repo.all.find_all{|invoice_item| invoice_item.invoice_id == invoice.id}}
     invoices_from_day.flatten!.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}
-    # return revenue
   end
 
   def top_revenue_earners(x=20)
-    #Take array of all merchants
-    #Map each merchant element to a hash {<merchant obj> => [invoice_repo.find_all_by_merchant_id]}
-    # For each hash value array of Invoices, Map to Invoice_total(invoice) - leaves an array of hashes with each hash value represents a merchant's invoice billing totals
-    # For each hash value array of totals, sum the array - now have an array of hashes {merchant => revenue}
-    # Take max X elements by revenue
-    # Map to just merchants
-    #return
-
-
-
-
-    # merchant_hashes = @merchant_repo.all.map { |merchant| {merchant => @invoice_repo.find_all_by_merchant_id(merchant.id)}}
-    # merchant_hashes.each_index { |index|
-    #   merchant_hashes[index].each {|merchant, invoice_array|
-    #     merchant_hashes[index][merchant] = invoice_array.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten}}
-    # merchant_hashes.each_index { |index|
-    #   merchant_hashes[index].each {|merchant, invoice_item_array|
-    #     merchant_hashes[index][merchant] = invoice_item_array.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}}}
-    # short_list = merchant_hashes.max(x) {}
-
-    merchant_hashes = @merchant_repo.all.map{ |merchant| {merchant: merchant, revenue: @invoice_repo.find_all_by_merchant_id(merchant.id)}}
-    merchant_hashes.each { |hash| hash[:revenue] = hash[:revenue].map {|invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten}
-    merchant_hashes.each { |hash| hash[:revenue] = hash[:revenue].map {|invoice_item| invoice_item.unit_price * invoice_item.quantity}}
-    merchant_hashes.each { |hash| hash[:revenue] = hash[:revenue].sum}
-    short_list = merchant_hashes.max(x) { |ahash, bhash| ahash[:revenue] <=> bhash[:revenue]}
-    short_list.map! { |hash| hash[:merchant]}
-    require 'pry';binding.pry
-    short_list
-    # p "hello"
-    # merchant_revenues = @merchant_repo.all.map{|merchant| {merchant: merchant.id, revenue: revenue_by_merchant(merchant.id)}} #array of hashes w/ id and revenue
-    # top_x = merchant_revenues.max(x) {|ahash, bhash| ahash[:revenue] <=> bhash[:revenue]}
-    # # require 'pry' ;binding.pry
-    # top_x.map! {|hash| @merchant_repo.find_by_id(hash[:merchant])}
+    paid_invoices = @invoice_repo.all.map { |invoice| invoice if invoice_paid_in_full?(invoice.id) }.compact
+    invoices_by_merch_id = paid_invoices.group_by { |invoice| invoice.merchant_id }
+    invoice_revenue_by_merch_id = invoices_by_merch_id.each { |k, v| v.map! { |v| invoice_total(v.id) } }
+    tot_rev_by_merch_id = invoice_revenue_by_merch_id.transform_values { |value| value.sum }
+    tot_rev_by_merchant = tot_rev_by_merch_id.transform_keys { |key| @merchant_repo.find_by_id(key) }
+    sorted_merchants = tot_rev_by_merchant.sort_by { |k,v| v }.reverse
+    top_earners = sorted_merchants.map { |array| array.first }.flatten[0..(x-1)]
   end
 
   def merchants_with_pending_invoices
@@ -148,28 +121,26 @@ class SalesAnalyst
   end
 
   def merchants_with_only_one_item
-    merchant_ids = @item_repo.all.map {|item| item.merchant_id} #make a hash of merchant IDs from all Invoices
-    returned_ids = merchant_ids #copy collection
-    returned_ids.delete_if{|returned_id| merchant_ids.find_all{|merchant_id| merchant_id == returned_id}.length > 1} #delete from copy if not unique
-    returned_merchants = returned_ids.map{|id| @merchant_repo.find_by_id(id)} #convert IDs to Merchants
+    merchant_ids = @item_repo.all.map {|item| item.merchant_id}
+    returned_ids = merchant_ids
+    returned_ids.delete_if{|returned_id| merchant_ids.find_all{|merchant_id| merchant_id == returned_id}.length > 1}
+    returned_merchants = returned_ids.map{|id| @merchant_repo.find_by_id(id)}
   end
 
   def merchants_with_only_one_item_registered_in_month (month_str)
     applicable_invoices = @invoice_repo.all.find_all{|invoice| invoice.created_at.month == Time.parse(month_str).month}
     applicable_invoices.map! {|invoice| {invoice: invoice, merchant: @merchant_repo.find_by_id(invoice.merchant_id)}}
-    applicable_invoices.delete_if{|hash| hash[:invoice].created_at.year != hash[:merchant].created_at.year} #leaves only invoices from month of creation
+    applicable_invoices.delete_if{|hash| hash[:invoice].created_at.year != hash[:merchant].created_at.year}
     returned_merchants = applicable_invoices
     returned_merchants.delete_if{ |returned_hash| (applicable_invoices.find_all{ |applicable_hash| applicable_hash[:merchant] == returned_hash[:merchant]}).length > 1}
     returned_merchants.map{|hash| hash[:merchant]}
   end
 
-  def revenue_by_merchant (merchant_id) #passig
+  def revenue_by_merchant (merchant_id) 
     merchant_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id)
     merchant_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)}
     merchant_invoices.map! { |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}
     merchant_invoices.flatten!
-    # require 'pry'; binding.pry
     merchant_invoices.sum {|invoice_item| invoice_item.unit_price * invoice_item.quantity}
   end
-
 end
