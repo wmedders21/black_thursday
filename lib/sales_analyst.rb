@@ -74,13 +74,14 @@ class SalesAnalyst
   end
 
   def invoice_paid_in_full?(invoice_id)
-    transaction = @transaction_repo.all.find { |transaction| transaction.invoice_id == invoice_id }
-    if transaction == nil
+    transaction = @transaction_repo.all.find_all { |transaction| transaction.invoice_id == invoice_id }
+    if transaction == []
       return false
-    elsif transaction.result == :failed
-      return false
+    # elsif transaction.result == :failed
+    #   return false
     end
-    transaction.result == :success
+    transaction.any? { |k| k.result == :success }
+    # binding.pry
   end
 
   def invoice_total(invoice_id)
@@ -109,6 +110,7 @@ class SalesAnalyst
     tot_rev_by_merchant = tot_rev_by_merch_id.transform_keys { |key| @merchant_repo.find_by_id(key) }
     sorted_merchants = tot_rev_by_merchant.sort_by { |k,v| v }.reverse
     top_earners = sorted_merchants.map { |array| array.first }.flatten[0..(x-1)]
+    # binding.pry
   end
 
   def merchants_with_pending_invoices
@@ -136,7 +138,7 @@ class SalesAnalyst
     returned_merchants.map{|hash| hash[:merchant]}
   end
 
-  def revenue_by_merchant (merchant_id) 
+  def revenue_by_merchant (merchant_id)
     merchant_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id)
     merchant_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)}
     merchant_invoices.map! { |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}
