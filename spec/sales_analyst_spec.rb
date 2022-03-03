@@ -143,7 +143,11 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.invoices_per_day_of_week_standard_deviation).to eq(18)
     end
 
-    
+    it 'can define numbers to corresponding days' do
+      expect(@sales_analyst.num_to_days(4)).to eq("Thursday")
+    end
+
+  
 
 
 
