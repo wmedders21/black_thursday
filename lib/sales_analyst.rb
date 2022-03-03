@@ -164,9 +164,9 @@ class SalesAnalyst
                                             elsif q > max_item[:quantity]
                                               max_item[:items].clear
                                               max_item[:items] << i
-                                              max_items[:quantity] = q
+                                              max_item[:quantity] = q
                                             end}
-    return max_items[:items] # return the array of max items
+    return max_item[:items] # return the array of max items
   end
 
 end
