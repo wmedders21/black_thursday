@@ -350,21 +350,21 @@ class SalesAnalyst
   end
 
 end
-
-require_relative './sales_engine'
-se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-                                       :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
-
-p se.analyst.most_sold_item_for_merchant(12335009)
-p "-----------------------------"
-p se.analyst.best_item_for_merchant(12335009)
-p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-p se.analyst.most_sold_item_for_merchant(12335057)
-p "-----------------------------"
-p se.analyst.best_item_for_merchant(12335057)
-p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
-
-p se.analyst.most_sold_item_for_merchant(12335080)
-p "-----------------------------"
-p se.analyst.best_item_for_merchant(12335080)
-p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+#
+# require_relative './sales_engine'
+# se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+#                                        :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+#
+# p se.analyst.most_sold_item_for_merchant(12335009)
+# p "-----------------------------"
+# p se.analyst.best_item_for_merchant(12335009)
+# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+# p se.analyst.most_sold_item_for_merchant(12335057)
+# p "-----------------------------"
+# p se.analyst.best_item_for_merchant(12335057)
+# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+#
+# p se.analyst.most_sold_item_for_merchant(12335080)
+# p "-----------------------------"
+# p se.analyst.best_item_for_merchant(12335080)
+# p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
