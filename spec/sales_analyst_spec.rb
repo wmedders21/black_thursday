@@ -139,6 +139,12 @@ RSpec.describe SalesAnalyst do
       expect(@sales_analyst.invoices_by_days_of_the_week[2].length).to eq(692)
     end
 
+    it 'can find the standard deviation of the invoices per day of week' do
+      expect(@sales_analyst.invoices_per_day_of_week_standard_deviation).to eq(18)
+    end
+
+    
+
 
 
     it "#invoice_status returns the percentage of invoices with given status" do
