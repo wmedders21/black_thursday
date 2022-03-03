@@ -246,36 +246,50 @@ class SalesAnalyst
   def most_sold_item_for_merchant(merchant_id)
     merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # get all merchant's invoices in an array
     merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten # convert to an array of arrays of invoice items, and flatten
-    summed_invoice_items = {} # new hash
+    item_measure = {} # new hash
     # for each invoice item, if the item ID exists as a key in new hash, increment the value by invoice item quantity, or else create the key and set the value to quantity. Creates hash of unique item keys and sums of sales quantities
-    merchants_invoice_items.each {|invoice_item| summed_invoice_items[invoice_item.item_id] ? summed_invoice_items[invoice_item.item_id] += invoice_item.quantity : summed_invoice_items[invoice_item.item_id] = invoice_item.quantity}
-    max_item = {quantity: 0, items: []} #comparison holder hash
-    summed_invoice_items.each_pair {|i, q|  if q == max_item[:quantity] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
-                                              max_item[:items] << i
-                                            elsif q > max_item[:quantity]
-                                              max_item[:items].clear
-                                              max_item[:items] << i
-                                              max_item[:quantity] = q
-                                            end}
-    output = max_item[:items].map {|item_num| @item_repo.find_by_id(item_num)}
-    # return max_item[:items] # return the array of max items
+    merchants_invoice_items.each {|invoice_item| item_measure[invoice_item.item_id] ? item_measure[invoice_item.item_id] += invoice_item.quantity : item_measure[invoice_item.item_id] = invoice_item.quantity}
+    max_measure = {measure: 0, items: []} #comparison holder hash
+    return helper_get_greates_measure(item_measure, max_measure)
   end
 
   def best_item_for_merchant(merchant_id)
     merchants_invoices = @invoice_repo.find_all_by_merchant_id(merchant_id) # all invoices for merchant
     merchants_invoices.keep_if {|invoice| invoice_paid_in_full?(invoice.id)} # keep only if invoice made profit
     merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten #convert remaining invoices to InvoiceItems
-    item_profits = {}
-    merchants_invoice_items.each {|invoice_item| item_profits[invoice_item.item_id] ? item_profits[invoice_item.item_id] += (invoice_item.quantity * invoice_item.unit_price) : item_profits[invoice_item.item_id] = (invoice_item.quantity * invoice_item.unit_price)}
-    max_profit = {profit: 0, items: []} #comparison hash holder
-    item_profits.each_pair {|i, p|  if p == max_profit[:profit] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
-                                      max_profit[:items] << i
-                                    elsif p > max_profit[:profit]
-                                      max_profit[:items].clear
-                                      max_profit[:items] << i
-                                      max_profit[:profit] = p
+    item_measure = {}
+    merchants_invoice_items.each {|invoice_item| item_measure[invoice_item.item_id] ? item_measure[invoice_item.item_id] += (invoice_item.quantity * invoice_item.unit_price) : item_measure[invoice_item.item_id] = (invoice_item.quantity * invoice_item.unit_price)}
+    max_measure = {measure: 0, items: []} #comparison hash holder
+    return helper_get_greates_measure(item_measure, max_measure)
+
+  end
+
+  def helper_get_greates_measure(item_measure, max_measure)
+    item_measure.each_pair {|i, m|  if m == max_measure[:measure] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
+                                      max_measure[:items] << i
+                                    elsif m > max_measure[:measure]
+                                      max_measure[:items].clear
+                                      max_measure[:items] << i
+                                      max_measure[:measure] = m
                                     end}
-    output = max_profit[:items].map {|item_num| @item_repo.find_by_id(item_num)}
+    output = max_measure[:items].map {|item_num| @item_repo.find_by_id(item_num)}
   end
 
 end
+
+se = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
+                                       :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv" })
+
+p se.analyst.most_sold_item_for_merchant(12335009)
+p "-----------------------------"
+p se.analyst.best_item_for_merchant(12335009)
+p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+p se.analyst.most_sold_item_for_merchant(12335057)
+p "-----------------------------"
+p se.analyst.best_item_for_merchant(12335057)
+p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
+
+p se.analyst.most_sold_item_for_merchant(12335080)
+p "-----------------------------"
+p se.analyst.best_item_for_merchant(12335080)
+p "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_"
