@@ -1,4 +1,3 @@
-# require 'CSV'
 require 'pry'
 require_relative './sales_engine.rb'
 require_relative './findable.rb'
@@ -6,8 +5,6 @@ require_relative './invoice_item.rb'
 require_relative './crudable.rb'
 require 'BigDecimal'
 require 'Time'
-# require 'simplecov'
-# SimpleCov.start
 
 class InvoiceItemRepository
   include Findable
@@ -31,12 +28,6 @@ class InvoiceItemRepository
   def find_all_by_invoice_id(invoice_id)
     invoice_items_by_invoice_id[invoice_id] || []
   end
-
-  # def sum_invoice_items(invoice_id)
-  #   find_all_by_invoice_id(invoice_id).sum do |invoice_item|
-  #     invoice_item.unit_price * invoice_item.quantity
-  #   end
-  # end
 
   def inspect
   end

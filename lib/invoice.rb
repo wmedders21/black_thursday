@@ -1,12 +1,6 @@
-# frozen_string_literal: false
-
 # This class Invoice should represent a single invoice, holding an invoice id, cstomer and merchant
 # id's, invoice status, and creation / updated time stamps, all of which may be referenced and some of
 # which may be updated by the item_repository
-
-# require 'simplecov'
-# require 'RSpec'
-# SimpleCov.start
 
 # Represents a single invoice, to be held in a InvoiceRepository class instance
 class Invoice

@@ -50,7 +50,8 @@ class SalesEngine
 
   def merchants
     merchant_array = @table_hash[:merchants].map do |row|
-      Merchant.new({ id: row[:id].to_i, name: row[:name], created_at: Time.parse(row[:created_at]), updated_at: Time.parse(row[:updated_at]) })
+      Merchant.new({ id: row[:id].to_i, name: row[:name], created_at: Time.parse(row[:created_at]),
+                     updated_at: Time.parse(row[:updated_at]) })
     end
     if @merchant_repo == nil
       @merchant_repo = MerchantRepository.new(merchant_array)
