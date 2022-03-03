@@ -279,9 +279,3 @@ class SalesAnalyst
   end
 
 end
-
-sales_engine = SalesEngine.from_csv({ :items => "./data/items.csv", :merchants => "./data/merchants.csv",
-                                       :transactions => "./data/transactions.csv", :invoice_items => "./data/invoice_items.csv", :invoices => "./data/invoices.csv", :customers => "./data/customers.csv"})
-
-puts sales_engine.analyst.most_sold_item_for_merchant(12334684)
-puts sales_engine.analyst.best_item_for_merchant(12334684)
