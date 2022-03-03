@@ -74,7 +74,8 @@ class SalesEngine
   def invoices
     invoice_array = @table_hash[:invoices].map do |row|
       Invoice.new({ id: row[:id].to_i, customer_id: row[:customer_id].to_i, merchant_id: row[:merchant_id].to_i,
-                    status: row[:status].downcase.to_sym, created_at: Time.parse(row[:created_at]), updated_at: Time.parse(row[:updated_at]) })
+
+                    status: row[:status].to_sym, created_at: Time.parse(row[:created_at]), updated_at: Time.parse(row[:updated_at]) })
     end
     if @invoice_repo == nil
       @invoice_repo = InvoiceRepository.new(invoice_array)
