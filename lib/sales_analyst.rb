@@ -267,7 +267,7 @@ class SalesAnalyst
     merchants_invoice_items = merchants_invoices.map{ |invoice| @invoice_item_repo.find_all_by_invoice_id(invoice.id)}.flatten #convert remaining invoices to InvoiceItems
     item_profits = {}
     merchants_invoice_items.each {|invoice_item| item_profits[invoice_item.item_id] ? item_profits[invoice_item.item_id] += (invoice_item.quantity * invoice_item.unit_price) : item_profits[invoice_item.item_id] = (invoice_item.quantity *invoice_item.unit_price)}
-    max_profit = {profit: 0 items: []} #comparison hash holder
+    max_profit = {profit: 0, items: []} #comparison hash holder
     item_profits.each_pair {|i, p|  if p == max_profit[:profit] #compare each item in hash to comparison hash and either add item if quantities equal or clear items, add new item, and set new quantity
                                       max_profit[:items] << i
                                     elsif p > max_profit[:profit]
